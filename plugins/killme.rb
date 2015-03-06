@@ -1,10 +1,12 @@
 require "open-uri"
 
+KILLME_REGEXP = %r(\Ahttp://aka\.saintpillia\.com/killme/icon/[0-9_-]{3,}\.png\z)
+
 url = 'http://killmebaby.tv/special_icon.html'
 html = open(url).read
 doc = Nokogiri::HTML(html, url)
-@killme = []
-doc.css('img').each{|link|@killme << link[:src] if /http:\/\/aka\.saintpillia\.com\/killme\/icon\/[0-9_-]{3,}\.png/ =~ link[:src]}
+
+@killme = doc.css('img').map{|link| link[:src] }.select{|src| KILLME_REGEXP =~ src }
 
 on_event(:tweet) do |obj|
 	if obj.text =~ /^(?!RT)@#{screen_name}\s+killme/
