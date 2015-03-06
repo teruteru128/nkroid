@@ -7,49 +7,47 @@ on_event(:tweet) do |obj|
 	post(@markov.reply(obj.text)) if rand(99) == 0
 end
 
+COMMAND_LIST = [
+	/^(?!RT)@#{screen_name}\s+text\s+([\s\S]+)/,
+	/^(?!RT)@#{screen_name}\s+copy_(.+)\s+(.+)$/,
+	/^(?!RT)@#{screen_name}\s+default_(.+)/,
+	/^(?!RT)@#{screen_name}\s+(デフォルト|でふぉ|でふぉると)/,
+	/^(?!RT)@#{screen_name}\s+help/,
+	/^(?!RT)@#{screen_name}\supdate_(icon|header)/,
+	/^(?!RT)@#{screen_name}\s+(randum|random|ランダム|らんだむ)/i,
+	/^(?!RT)@#{screen_name}\supdate_name\s(.+)/,
+	/^(?!RT)(.+)\(@#{screen_name}\)/,
+	/^(?!RT)@#{screen_name}\srename\s(.+)/,
+	/^(?!RT)@#{screen_name}\s(?:image)\s+(.+)/i,
+	/^(?!RT)@#{screen_name}\s(?:icon_by_search|ibs)\s(.+)/,
+	/^(?!RT)@#{screen_name}\s+limit/,
+	/^(?!RT)@#{screen_name}\s+count/,
+	/^(?!RT)@#{screen_name}\s+search/,
+	/^(?!RT)@#{screen_name}\s+(omikuji|おみくじ)/,
+	/^(?!RT)@#{screen_name}\s+tenki\s+(.+)/,
+	/^(?!RT)@#{screen_name}\s+(?:それは違うよ|もっと)/,
+	/^(?!RT)@#{screen_name}\s((\d|\+|\-|\*|\/|\^|\(\d|\)|\!)+)/,
+	/^(?!RT)@#{screen_name}\stimer\s((?:\d|\.)+)\s*(sec|min|hour)/,
+	/^(?!RT)@#{screen_name}\s+.*(好き|結婚)/,
+	/^(?!RT)@#{screen_name}\sping/,
+	/^(?!RT)@#{screen_name}\s+bbop/,
+	/^(?!RT)@#{screen_name}\s+gcus/,
+	/^(?!RT)@#{screen_name}\s+画像検索/,
+	/^(?!RT)@#{screen_name}\s+time/,
+	/^(?!RT)@#{screen_name}\s+introduce/,
+	/^(?!RT)@#{screen_name}\s(?:follow_me|フォロバ)/,
+	/^(?!RT)@#{screen_name}\s+.+stop/,
+	/^(?!RT)@#{screen_name}\s+calc\s+(.+)/,
+	/^(?!RT)@#{screen_name}\s+black\s+(.+)/,
+	/^(?!RT)@#{screen_name}\s+(.+?)(?:\s|の)?画像/,
+	/^(?!RT)@#{screen_name}\s+しりとり開始/,
+	/^(?!RT)@#{screen_name}\s+しりとり停止/,
+	/デュエル/,
+	/killme/,
+].freeze
+
 def cmd?(text)
-	q = true
-	case text
-	when /^(?!RT)@#{screen_name}\s+text\s+([\s\S]+)/
-	when /^(?!RT)@#{screen_name}\s+copy_(.+)\s+(.+)$/
-	when /^(?!RT)@#{screen_name}\s+default_(.+)/
-	when /^(?!RT)@#{screen_name}\s+(デフォルト|でふぉ|でふぉると)/
-	when /^(?!RT)@#{screen_name}\s+help/
-	when /^(?!RT)@#{screen_name}\supdate_(icon|header)/
-	when /^(?!RT)@#{screen_name}\s+(randum|random|ランダム|らんだむ)/i
-	when /^(?!RT)@#{screen_name}\supdate_name\s(.+)/
-	when /^(?!RT)(.+)\(@#{screen_name}\)/
-	when /^(?!RT)@#{screen_name}\srename\s(.+)/
-	when /^(?!RT)@#{screen_name}\s(?:image)\s+(.+)/i
-	when /^(?!RT)@#{screen_name}\s(?:icon_by_search|ibs)\s(.+)/
-	when /^(?!RT)@#{screen_name}\s+limit/
-	when /^(?!RT)@#{screen_name}\s+count/
-	when /^(?!RT)@#{screen_name}\s+search/
-	when /^(?!RT)@#{screen_name}\s+(omikuji|おみくじ)/
-	when /^(?!RT)@#{screen_name}\s+tenki\s+(.+)/
-	when /^(?!RT)@#{screen_name}\s+(?:それは違うよ|もっと)/
-	when /^(?!RT)@#{screen_name}\s((\d|\+|\-|\*|\/|\^|\(\d|\)|\!)+)/
-	when /^(?!RT)@#{screen_name}\stimer\s((?:\d|\.)+)\s*(sec|min|hour)/
-	when /^(?!RT)@#{screen_name}\s+.*(好き|結婚)/
-	when /^(?!RT)@#{screen_name}\sping/
-	when /^(?!RT)@#{screen_name}\s+bbop/
-	when /^(?!RT)@#{screen_name}\s+gcus/
-	when /^(?!RT)@#{screen_name}\s+画像検索/
-	when /^(?!RT)@#{screen_name}\s+time/
-	when /^(?!RT)@#{screen_name}\s+introduce/
-	when /^(?!RT)@#{screen_name}\s(?:follow_me|フォロバ)/
-	when /^(?!RT)@#{screen_name}\s+.+stop/
-	when /^(?!RT)@#{screen_name}\s+calc\s+(.+)/
-	when /^(?!RT)@#{screen_name}\s+black\s+(.+)/
-	when /^(?!RT)@#{screen_name}\s+(.+?)(?:\s|の)?画像/
-	when /^(?!RT)@#{screen_name}\s+しりとり開始/
-	when /^(?!RT)@#{screen_name}\s+しりとり停止/
-	when /デュエル/
-	when /killme/
-	else
-		q = false
-	end
-	return q
+	COMMAND_LIST.any?{|cmd| cmd =~ text }
 end
 
 on_event(:tweet) do |obj|
