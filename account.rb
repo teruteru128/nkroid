@@ -76,7 +76,8 @@ class Account
 	end
 
 	def start
-		@stream.user(:replies => "all") do |obj|
+		Thread.new{loop{sleep 20;GC.start}}
+		@stream.user do |obj|
 			extract_obj(obj)
 		end
 	rescue => e
@@ -116,7 +117,7 @@ class Account
 			fallback
 			retry
 		else
-			t=Thread.new{start};t.join
+			retry
 		end
 	end
 end
