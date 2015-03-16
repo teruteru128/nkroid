@@ -1,6 +1,6 @@
 require "open-uri"
 
-url = 'http://114514.jp/114514.png'
+url = 'https://114514.jp/114514.png'
 
 on_event(:tweet) do |obj|
 	if obj.text =~ /^(?!RT)@#{screen_name}\s+114514/
