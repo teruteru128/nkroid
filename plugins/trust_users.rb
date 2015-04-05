@@ -1,6 +1,7 @@
 require "yaml"
 
 @following = []
+@dirty = []
 nkpoid = Twitter::REST::Client.new((YAML.load_file("/root/update_nkpoid/keys.yml"))[0])
 myself = nkpoid.user.id
 
@@ -13,5 +14,5 @@ Thread.new do
 end
 
 def trust?(id)
-	@following.include?(id)
+	@following.include?(id) && !@dirty.include?(id)
 end
