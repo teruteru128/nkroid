@@ -1,5 +1,3 @@
-require "weather_jp"
-
 on_event(:tweet) do |obj|
 	next if obj.text =~ /RT/
 	case obj.text

@@ -1,42 +1,35 @@
 # coding: utf-8
 
 require "open-uri"
-require "fileutils"
 
-def search_image(word)
-	q = URI.encode(word)
+def image_url(word,n)
 	urls = []
-	for i in 1..3
+	q = URI.encode(word)
+	for i in 1..n
 		open("http://ajax.googleapis.com/ajax/services/search/images?q=#{q}&v=1.0&hl=ja&rsz=large&start=#{i}&safe=off") do |file|
 			JSON.load(file)["responseData"]["results"].each do |results|
 				urls << results["url"]
 			end
 		end
 	end
-	url = urls.flatten.sample
-	if url
-		url
-	else
-		open("http://ajax.googleapis.com/ajax/services/search/images?q=#{URI.escape("見せられないよ")}&v=1.0&hl=ja&rsz=large&start=1&safe=on") do |file|
-			JSON.load(file)["responseData"]["results"].each do |results|
-				urls << results["url"]
-			end
-		end
-		urls.flatten.sample
-	end
+	urls.flatten.sample
+end
+
+def search_image(word)
+	url = image_url(word,2)
+	url ? url : image_url("見せられないよ",1)
 end
 
 def tweet_pic(obj,text,word)
 	@rest.fav(obj)
 	Thread.start do
 		uri = search_image(word)
-		open(uri) do |io|
-			pass = temp_io(io)
-			file = File.open(pass)
-			twitter.update_with_media(text, file, :in_reply_to_status_id => obj.id)
-			FileUtils.rm(file) #後処理
-		end
+		file = open uri
+		twitter.update_with_media(text, file, :in_reply_to_status_id => obj.id)
+		file.unlink
 	end
+rescue => e
+	mention(obj,"#{e.class}\n#{e.message}\n#{time}")
 end
 
 on_event(:tweet) do |obj|
@@ -44,12 +37,12 @@ on_event(:tweet) do |obj|
 	case obj.text
 	when /^(?!RT)(.+?)(?:\s|\t)+画像/
 		word = $1.gsub(/(\s+|　+|\t+)$/,"").gsub(/(の|な)$/,"")
-		next if obj.text =~ /@|＠|RT|rt|;/
+		next if obj.text =~ /@|＠|RT|rt/
 		text = "@#{obj.user.screen_name} #{word}の画像です #SearchImage"
 		tweet_pic(obj,text,word)
 	when /^(?!RT)@#{screen_name}\simage\s(.+)/
-		word = $1.gsub(/(\s+|　+|\t+)$/,"").gsub(/(の|な)$/,"")
-		next if word =~ /@|＠|RT|rt|グロ|;/
+		word = $1.gsub(/(\s|　|\t)+$/,"").gsub(/(の|な)$/,"")
+		next if word =~ /@|＠|RT|rt/
 		text = "@#{obj.user.screen_name} #{word}の画像です #SearchImage"
 		tweet_pic(obj,text,word)
 	when /^(?!RT)@#{screen_name}\s+(.+?)(?:\s|の)?画像/
