@@ -1,0 +1,25 @@
+- |-
+  Usage(1/4)
+  ●update_name [Name]
+  ●update_icon [Media]
+  ●update_header [Media]
+  ●random 
+- |-
+  Usage(2/4)
+  ●image [SearchWord]
+  ●copy_[name|icon|all] (@)[UserID]
+  ●bbop
+  ●calc [formula]
+- |-
+  Usage(3/4)
+  ●icon_by_search(alias:ibs) [SearchWord]
+  ●default_[name|icon|all]
+  ●omikuji
+  ●これなに [Media]
+  ●似てるのなに [Media]
+- |-
+  Usage(for Admin,a prefix(sudo) is required.)
+  ●block user
+  ●unblock user
+  ●profile [lock|unlock]
+  ●stop
