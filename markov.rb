@@ -10,6 +10,7 @@ BEGIN_FLG = '[BEGIN]'
 END_FLG = '[END]'
 
 class Markov
+	attr_reader :natto
 	def initialize
 		@db = SQLite3::Database.open(File.expand_path("../data", __FILE__)+"/markov.db")
 		@natto = Natto::MeCab.new
@@ -34,7 +35,7 @@ class Markov
 	end
 	
 	def keyphrase(sentence)
-		url = "http://jlp.yahooapis.jp/KeyphraseService/V1/extract?appid={YOUR-APP-ID}-&sentence=#{URI.encode(sentence)}"
+		url = "http://jlp.yahooapis.jp/KeyphraseService/V1/extract?appid=dj0zaiZpPUF4bHBKc29UTDNuMyZzPWNvbnN1bWVyc2VjcmV0Jng9NDk-&sentence=#{URI.encode(sentence)}"
 		doc = REXML::Document.new(open(url))
 		arr = []
 		doc.elements.each("ResultSet/Result/Keyphrase") do |e|

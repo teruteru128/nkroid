@@ -4,5 +4,10 @@ on_event(:dm) do |obj|
 	next unless trust?(id)
 	next if sn =~ screen_name
 	puts "DirectMessage -> @#{sn}:#{obj.text}"
-	@rest.dm(id, @markov.reply(obj.text))
+	if obj.text =~ /^post\s+(.+)/
+		post $1
+		@rest.dm(id,Time.now)
+	else
+		@rest.dm(id, @markov.reply(obj.text))
+	end
 end

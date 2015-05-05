@@ -8,13 +8,18 @@
   Usage(2/4)
   ●image [SearchWord]
   ●copy_[name|icon|all] (@)[UserID]
-  ●tenki [PlaceName]
+  ●bbop
+  ●calc [formula]
 - |-
   Usage(3/4)
   ●icon_by_search(alias:ibs) [SearchWord]
-  ●default_[name|url|location|icon|all]
+  ●default_[name|icon|all]
   ●omikuji
+  ●これなに [Media]
+  ●似てるのなに [Media]
 - |-
-  Usage(4/4)
-  ●bbop
-  ●calc [formula]
+  Usage(for Admin,a prefix(sudo) is required.)
+  ●block user
+  ●unblock user
+  ●profile [lock|unlock]
+  ●stop
