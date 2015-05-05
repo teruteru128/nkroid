@@ -1,5 +1,7 @@
 # coding: utf-8
 
+@count = Hash.new(0)
+
 def save_name(sn,name,time)
 	@db.execute <<-SQL
 		CREATE TABLE IF NOT EXISTS name
@@ -8,23 +10,23 @@ def save_name(sn,name,time)
 	@db.execute"INSERT INTO name VALUES (?,?,?)", [sn, name, time]
 end
 
-def update_profile(obj,str)
-	unless trust?(obj.user.id)
-		mention(obj,"現在、update機能は特定の方しかご利用になれません。\n#{Time.now}")
+def update_name(obj,name)
+	if @profile_locked
+		mention(obj,"プロフィールは現在#{@locker}によってロックされています。\n#{time}")
 		return
 	end
-	@rest.update_profile(:name => str)
-	mention(obj,"#{str.gsub("@","@\u200b")}になりました。")
-	save_name(obj.user.screen_name,str,Time.now.strftime("%Y-%m-%d %H:%M:%S"))
+	@rest.update_profile(:name => name)
+	mention(obj,"#{name.gsub("@","@\u200b")}になりました。")
+	save_name(obj.user.screen_name,name,time)
 end
 
 on_event(:tweet) do |obj|
 	case obj.text
 	when /^(?!RT)@#{screen_name}\supdate_name\s(.+)/
-		update_profile(obj,$1)
+		update_name(obj,$1)
 	when /^(?!RT)(.+)\(@#{screen_name}\)/
-		update_profile(obj,$1)
+		update_name(obj,$1)
 	when /^(?!RT)@#{screen_name}\srename\s(.+)/
-		update_profile(obj,$1)
+		update_name(obj,$1)
 	end
 end
