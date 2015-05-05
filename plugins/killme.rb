@@ -10,6 +10,10 @@ doc = Nokogiri::HTML(html, url)
 
 on_event(:tweet) do |obj|
 	if obj.text =~ /^(?!RT)@#{screen_name}\s+killme/
+		if @profile_locked
+			mention(obj,"プロフィールは現在#{@locker}によってロックされています。\n#{time}")
+			next
+		end
 		icon_url = @killme.sample
 		@rest.update_profile_image(open(icon_url))
 		mention(obj,"キルミーアイコン(#{icon_url})に変更しました。\n#{Time.now}")
