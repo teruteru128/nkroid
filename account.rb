@@ -32,27 +32,13 @@ class Account
 			end
 		end
 	end
+
+	def fallback
+		@limited > 3 ? @limited = 0 : @limited += 1
+	end
 	
 	def screen_name
-		/nkroid\w*/
-	end
-		
-	def fallback(*args)
-		Thread.new{n=@limited;sleep(600);@limited=n}
-		if args.empty?
-			@limited += 1
-			@limited = 0 if @limited < 3
-		else
-			args[0] =~ /nkroid(.*)/
-			mark = $1
-			@limited = case mark
-				when "" then 0
-				when /2/ then 1
-				when /3/ then 2
-				when /4/ then 3
-				else 0
-				end
-		end
+		/nkroid.*/
 	end
 
 	def twitter
@@ -66,23 +52,30 @@ class Account
 		retry
 	end
 	
-	def mention(obj,texts)
+	def mention(obj,texts,opt=false)
+		pre = opt ? "." : ""
 		texts.scan(/.{1,#{120}}/m).each do |text|
-			twitter.update("@#{obj.user.screen_name} #{text}",:in_reply_to_status_id => obj.id)
+			twitter.update("#{pre}@#{obj.user.screen_name} #{text}",:in_reply_to_status_id => obj.id)
 		end
 	rescue Twitter::Error::Forbidden
 		fallback
 		retry
 	end
+	
+	def startup
+		Thread.new{loop{sleep 60*5;@limited=0}}
+		Thread.new{loop{sleep 20;GC.start}}
+	end
 
 	def start
-		Thread.new{loop{sleep 20;GC.start}}
-		@stream.user do |obj|
+		startup
+		@stream.user(:replies => "all") do |obj|
 			extract_obj(obj)
 		end
 	rescue => e
 		@twerr.update e.message
-		t=Thread.new{start};t.join
+		$stderr.puts e.message
+		retry
 	end
 	
 	def extract_obj(obj)
@@ -90,15 +83,16 @@ class Account
 		when Twitter::Tweet
 			return if obj.user.screen_name =~ screen_name
 			return if obj.text =~ /@null|定期|自動/
-			Thread.new{callback(:tweet, obj)}
-		when Twitter::Streaming::Event
+			return if obj.text =~ /^RT/
+			Thread.start{callback(:tweet, obj)}
+	when Twitter::Streaming::Event
 			callback(:event, obj)
 		when Twitter::Streaming::FriendList
-			puts "System -> Start streaming of @nkroid..."
+			puts "System -> Start streaming of @#{screen_name}..."
 		when Twitter::Streaming::DeletedTweet
 			callback(:delete, obj)
 		when Twitter::DirectMessage
-			callback(:dm, obj)
+			Thread.new{callback(:dm, obj)}
 		end
 	rescue Twitter::Error::Forbidden
 		fallback
@@ -107,17 +101,13 @@ class Account
 		n = e.rate_limit.reset_in
 		sleep n
 		t=Thread.new{start};t.join
-	rescue SQLite3::BusyException
-		retry
-	rescue Twitter::Error::NotFound,SQLite3::SQLException
+	rescue Twitter::Error::NotFound,SQLite3::SQLException,SQLite3::BusyException
 		return
+	rescue Twitter::Error
+		retry
 	rescue => e
-		@twerr.update "Error -> #{e.class}\n#{Time.now}"
-		if e.message =~ /limit/i
-			fallback
-			retry
-		else
-			retry
-		end
+		@twerr.update "Error -> #{e.class}\n#{e.message}\n#{Time.now}"
+		puts e.backtrace
+		retry
 	end
 end
