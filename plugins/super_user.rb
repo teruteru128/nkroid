@@ -60,7 +60,7 @@ SUDO_COMMANDS = {
 	/^(?:report_spam|r4s)\s+@?(\w+)/ => proc{|m| r4s m[1]},
 
 	/^stop/ =>
-		proc do
+		proc do |m, obj|
 			mention(obj, "bye.\n#{time}")
 			exit
 		end,
