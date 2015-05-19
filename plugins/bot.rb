@@ -43,7 +43,8 @@ COMMAND_LIST = [
 	/#{REPLY}しりとり停止/,
 	/#{REPLY}これ(なに|何)/,
 	/#{REPLY}killme/,
-	/#{REPLY}sudo\s+(.+)$/
+	/#{REPLY}sudo\s+(.+)$/,
+	/#{REPLY}list/,
 ].freeze
 
 WORD_LIST = [

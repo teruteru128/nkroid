@@ -5,7 +5,7 @@ require "cgi"
 def post2recotw(id,name)
 	uri = URI.parse("http://api.recotw.black/1/tweet/record_tweet")
 	http = Net::HTTP.start(uri.host, uri.port)
-	header = {"user-agent" => "Ruby/#{RUBY_VERSION} MyHttpClient"}
+	header = {"user-agent" => "Ruby/#{RUBY_VERSION} nkroid"}
 	body = "id=#{id}&via=#{name}"
 	response = http.post(uri.path, body, header)
 	JSON.parse response.body
