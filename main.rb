@@ -23,7 +23,7 @@ $stream = Twitter::Streaming::Client.new($keys[0])
 $db = PG::connect(YAML.load_file($dir+"/data/dbconfig.yml")["connection"])
 $threads = []
 
-#外部読み込み処理
+#外部読み込み処理開始
 cores = Dir.glob($dir+"/system/*.rb").sort
 cores.each do |core|
 	core =~ /system\/(.+\.rb)$/
@@ -39,7 +39,6 @@ $markov = Markov.new
 
 def main
 	$stream.user(:replies => "all") do |obj|
-		next if Twitter::Streaming::FriendList === obj
 		if $threads.length > 19
 			$threads[0].kill 
 			$threads.slice! 0
