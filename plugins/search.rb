@@ -17,15 +17,10 @@ def google(word,obj)
 end
 
 def search_temp(obj)
-	if obj.media?
-		obj.media.each do|value|
-			uri = value.media_uri.to_s
-			res_uri = "http://www.google.co.jp/searchbyimage?image_url=#{uri}"
-			mention(obj,"画像検索結果です\n#{res_uri}")
-		end
-	else
-		obj.reply "画像が見つかりませんでした。画像を添付して、再実行してください。"
-	end
+	return if !obj.media?
+	uri = obj.media[0].media_uri.to_s
+	res_uri = "http://www.google.co.jp/searchbyimage?image_url=#{uri}"
+	mention(obj,"画像検索結果です\n#{res_uri}")
 end
 
 on_event(:tweet) do |obj|

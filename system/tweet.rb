@@ -16,6 +16,7 @@ class Twitter::Tweet
 		end
 	rescue Twitter::Error
 		$accounts.fallback
+		$console.info "account changed(@#{$accounts.cursor.user.screen_name})"
 		retry
 	end
 end

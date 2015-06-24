@@ -24,6 +24,8 @@ def copy(type,id,obj)
 		text = "Format error"
 	end
 	obj.reply text
+rescue => e
+	obj.reply e.message
 end
 
 on_event(:tweet) do |obj|

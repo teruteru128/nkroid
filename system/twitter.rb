@@ -20,5 +20,6 @@ def mention(obj,texts,opt=false)
 	end
 rescue Twitter::Error
 	$accounts.fallback
+	$console.info "account changed(@#{$accounts.cursor.user.screen_name})"
 	retry
 end
