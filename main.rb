@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # coding: utf-8
 $dir = File.expand_path(".")
-print "System -> init..."
+print "init..."
 $init_thread = Thread.new{loop{sleep 0.4;$stderr.print "."}}
 
 #ねくろいどはご覧のスポンサーでお送りいたします
