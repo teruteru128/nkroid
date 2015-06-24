@@ -21,16 +21,16 @@ def search_image(word)
 end
 
 def tweet_pic(obj,word)
-	$rest.fav(obj)
 	uri = search_image(word)
 	if trust? obj.user.id
+		$rest.fav(obj)
 		twitter.update_with_media(
 			"@#{obj.user.screen_name} #{word}の画像です #SearchImage",
 			open(uri),
 			:in_reply_to_status_id => obj.id
 		)
 	else
-		twitter.update("@#{obj.user.screen_name} #{word}の画像です #{uri} #SearchImage",:in_reply_to_status_id => obj.id)
+		obj.reply "#{word}の画像です #{uri} #SearchImage"
 	end
 rescue => e
 	obj.reply e.message

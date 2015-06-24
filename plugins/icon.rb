@@ -19,20 +19,18 @@ def update_icon(obj, type)
 	end
 	mention(obj,"#{type}を#{uri}に変更しました！")
 rescue => e
-	mention(obj,"#{e.message}\n#{Time.now}")
+	obj.reply e.message
+	$console.error e
 end
 
 def icon_by_search(obj,q)
-	if @profile_locked
-		mention(obj,"プロフィールは現在#{@locker}によってロックされています。\n#{time}")
-		return
-	end
 	uri = search_image(q)
 	file = open(uri)
 	$rest.update_profile_image(file)
-	mention(obj,"アイコンを#{q}の検索結果に変更しました！\n#{uri}")
+	obj.reply "アイコンを#{q}の検索結果に変更しました！\n#{uri}"
 rescue => e
-	mention(obj,e.message)
+	obj.reply e.message
+	$console.error e
 end
 
 on_event(:tweet) do |obj|
