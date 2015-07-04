@@ -27,7 +27,7 @@ def recotw(obj)
 		else
 			tweet = res["content"]
 			tweet = tweet.size > 20 ? tweet[0,19]+"..." : tweet
-			text = "@#{res["target_sn"]}さんの黒歴史(#{tweet})をRecotwしました。\nhttp://recotw.chitoku.jp/?id=#{res["tweet_id"]}"
+			text = "@#{res["target_sn"]}さんの黒歴史(#{tweet})をRecotwしました。\nhttps://recotw.chitoku.jp/?id=#{res["tweet_id"]}"
 		end
 		mention(obj,text)
 	end
