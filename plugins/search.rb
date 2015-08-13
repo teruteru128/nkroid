@@ -13,25 +13,17 @@ def google(word,obj)
 		result = JSON.load(file)["responseData"]["results"][0]
 	end
 	text = "#{result["titleNoFormatting"]}\n#{Sanitize.clean(result["content"])[0,39]}\n#{result["unescapedUrl"]}".gsub("@","@\u200b")
-	twitter.update("@#{obj.user.screen_name} #{text}",:in_reply_to_status_id => obj.id)
-end
-
-def search_temp(obj)
-	return if !obj.media?
-	uri = obj.media[0].media_uri.to_s
-	res_uri = "http://www.google.co.jp/searchbyimage?image_url=#{uri}"
-	mention(obj,"画像検索結果です\n#{res_uri}")
+	obj.reply text
 end
 
 on_event(:tweet) do |obj|
+	next if obj.text =~ /rt|@/i
 	case obj.text
-	when /^(?!RT)(?!@)(.+?)\s+(?:検索|とは|#とは)/
+	when /(.+)\s+(?:検索|とは|#とは)/
 		google($1,obj)
-	when /^(?!RT)@#{screen_name}\s+search\s+(.+)/
+	when /(.+)\s*(?:is|って)何/
 		google($1,obj)
-	when /(.+)\s*is何/
-		google($1,obj)
-	when /^(?!RT)@#{screen_name}\s+画像検索/
-		search_temp(obj)
 	end
 end
+
+command(/search\s+(.+)/){|obj|google(obj.args[0],obj)}

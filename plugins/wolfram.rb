@@ -23,8 +23,9 @@ rescue => e
 	""
 end
 
-command(/(\d+)$/) do |obj|
-	num = $1
+command(/^(\d+)$/) do |obj|
+	$rest.fav obj
+	num = obj.args[0]
 	t = Time.now
 	result = prime(num)
 	if result.size != 0
@@ -36,8 +37,8 @@ command(/(\d+)$/) do |obj|
 end
 
 command(/calc\s+(.+)/) do |obj|
-	formula = $1
 	$rest.fav obj
+	formula = obj.args[0]
 	t = Time.now
 	doc = Nokogiri::XML(open("http://api.wolframalpha.com/v2/query?input=#{CGI.escape(formula)}&appid=JY2U2Q-E8K7LG8KGR"))
 	result = doc.xpath('//pod[@title="Result"]/subpod/plaintext').text

@@ -1,3 +1,3 @@
 def time
-	Time.now.strftime("%Y-%m-%d %H:%M:%S")
+	Time.now.strftime($console.datetime_format)
 end

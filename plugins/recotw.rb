@@ -29,10 +29,10 @@ def recotw(obj)
 			tweet = tweet.size > 20 ? tweet[0,19]+"..." : tweet
 			text = "@#{res["target_sn"]}さんの黒歴史(#{tweet})をRecotwしました。\nhttps://recotw.chitoku.jp/?id=#{res["tweet_id"]}"
 		end
-		mention(obj,text)
+		obj.reply text
 	end
 rescue => e
-	mention(obj,e.message+"\n#{Time.now}")
+	obj.reply e.message+"\n#{Time.now}"
 end
 
 on_event(:tweet) do |obj|

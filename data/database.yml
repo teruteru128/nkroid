@@ -1,0 +1,5 @@
+production:
+  host: ""
+  user: ""
+  password: ""
+  dbname: ""

@@ -1,33 +1,18 @@
 # coding: utf-8
 
-def default(obj,target,type)
-	$rest.fav obj
-	icon,header = $dir+"/data/profile/nkroid_icon.png",$dir+"/data/profile/nkroid_header.png"
-	case type
-	when "name"
+def default(obj)
+	Thread.new do
+		$rest.fav obj
 		$rest.update_profile(:name => "ねくろいど")
-	when "icon"
+		icon,header = *(["icon.png","header.png"].map{|p|"#{$dir}/data/profile/#{p}"})
 		open(icon){|file|$rest.update_profile_image(file)}
-	when "header"
+		sleep 1
 		open(header){|file|$rest.update_profile_banner(file)}
-	when "all"
-		$rest.update_profile(:name => "ねくろいど")
-		open(icon){|file|$rest.update_profile_image(file)}
-		open(header){|file|$rest.update_profile_banner(file)}
+		obj.reply "プロフィールをデフォルトに戻しました"
 	end
-	if type == "all"
-		text = "プロフィールをデフォルトに戻しました"
-	else
-		text = "#{type}をデフォルトに戻しました"
-	end
-	obj.reply text
+rescue => e
+	obj.reply e.message
+	$console.error e
 end
 
-on_event(:tweet) do |obj|
-	case obj.text
-	when /^(?!RT)@(#{screen_name})\s+default_(.+)/
-		default(obj,$1,$2)
-	when /^(?!RT)@(#{screen_name})\s+(デフォルト|でふぉ|でふぉると)/
-		default(obj,$1,"all")
-	end
-end
+command(/default|デフォルト|でふぉ|でふぉると/){|obj|default(obj)}

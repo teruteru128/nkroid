@@ -1,29 +1,27 @@
 # coding: utf-8
 require "open-uri"
 
-def update_icon(obj, type)
-	if @profile_locked
-		mention(obj,"プロフィールは現在#{@locker}によってロックされています。\n#{time}")
-		return
-	end
-	raise "画像を添付してください。" unless obj.media?
-	uri = obj.media[0].media_uri.to_s+":orig"
-	file = open(uri)
+def update_icon(obj)
+	raise "画像を添付してください。" if !obj.media?
+	$rest.fav obj
+	url = obj.media[0].media_uri.to_s
+	file = open(url)
+	type = obj.args[0]
 	case type
 	when "icon"
 		$rest.update_profile_image(file)
 	when "header"
 		$rest.update_profile_banner(file)
-	else
-		return
 	end
-	mention(obj,"#{type}を#{uri}に変更しました！")
+	sleep 1
+	obj.reply "#{type}を#{url}に変更しました！"
 rescue => e
 	obj.reply e.message
 	$console.error e
 end
 
-def icon_by_search(obj,q)
+def icon_by_search(obj)
+	q = obj.args[0]
 	uri = search_image(q)
 	file = open(uri)
 	$rest.update_profile_image(file)
@@ -33,11 +31,5 @@ rescue => e
 	$console.error e
 end
 
-on_event(:tweet) do |obj|
-	case obj.text
-	when /^(?!RT)@#{screen_name}\supdate_(icon|header)/
-		update_icon(obj,$1)
-	when /^(?!RT)@#{screen_name}\s(?:icon_by_search|ibs)\s(.+)/
-		icon_by_search(obj,$1)
-	end
-end
+command(/update_(icon|header)/){|obj|update_icon(obj)}
+command(/(?:icon_by_search|ibs)\s(.+)/){|obj|icon_by_search(obj)}

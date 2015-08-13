@@ -20,14 +20,23 @@ def callback(event,obj)
 	end
 end
 
-def extract_obj(obj)
+def command_callback(obj)
+	$commands.keys.each do |cmd|
+		if obj.text =~ /^(?!RT)@#{screen_name}\s+#{cmd}/
+			obj.args = [$1,$2,$3,$4,$5]
+			$commands[cmd].call(obj)
+		end
+	end
+rescue
+	puts obj.text
+end
+
+def extract(obj)
 	case obj
 	when Twitter::Tweet
 		return if obj.user.screen_name =~ screen_name
 		callback(:tweet, obj)
-		$commands.keys.each do |cmd|
-			$commands[cmd].call(obj) if obj.text =~ /^(?!RT)@#{screen_name}\s+#{cmd}/
-		end
+		command_callback(obj)
 	when Twitter::Streaming::Event
 		callback(:event, obj)
 	when Twitter::Streaming::FriendList
@@ -39,12 +48,10 @@ def extract_obj(obj)
 	end
 rescue Twitter::Error::Forbidden
 	$accounts.fallback
-	retry
-rescue Twitter::Error::TooManyRequests => e
-	sleep e.rate_limit.reset_in
-	return 
-rescue Twitter::Error::NotFound
+rescue Twitter::Error::TooManyRequests
+	post $!.class
+	sleep 600
 	return
-rescue Twitter::Error
-	retry
+rescue Twitter::Error::NotFound,Twitter::Error
+	return
 end

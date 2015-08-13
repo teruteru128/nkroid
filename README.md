@@ -1,3 +1,3 @@
 # nkroid
-@nkroidのソースコード  
-桐間紗路ちゃんの************
+[@nkroid](http://twitter.com/nkroid)のソースコード  
+プラグイン開発者募集中です

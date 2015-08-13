@@ -21,17 +21,10 @@ def search_image(word)
 end
 
 def tweet_pic(obj,word)
-	uri = search_image(word)
-	if trust? obj.user.id
-		$rest.fav(obj)
-		twitter.update_with_media(
-			"@#{obj.user.screen_name} #{word}の画像です #SearchImage",
-			open(uri),
-			:in_reply_to_status_id => obj.id
-		)
-	else
-		obj.reply "#{word}の画像です #{uri} #SearchImage"
-	end
+	word = word.gsub(/(\s+|　+|\t+)$/,"").gsub(/(の|な)$/,"").gsub("@","@\u200b")
+	url = search_image(word)
+	text = "#{word}の画像です #{url} #SearchImage"
+	obj.reply text
 rescue => e
 	obj.reply e.message
 	$console.error e
@@ -43,15 +36,11 @@ on_event(:tweet) do |obj|
 		word = $1.gsub(/(\s+|　+|\t+)$/,"").gsub(/(の|な)$/,"")
 		next if obj.text =~ /@|＠|RT|rt/
 		tweet_pic(obj,word)
-	when /^(?!RT)@#{screen_name}\simage\s(.+)/
-		word = $1.gsub(/(\s|　|\t)+$/,"").gsub(/(の|な)$/,"")
-		next if word =~ /@|＠|RT|rt/
-		tweet_pic(obj,word)
-	when /^(?!RT)@#{screen_name}\s+(.+?)(?:\s|の)?画像/
-		word = $1.gsub("@","@\u200b")
-		tweet_pic(obj,word)
 	end
 end
+
+command(/image\s(.+)/){|obj|tweet_pic(obj,obj.args[0])}
+command(/(.+?)(?:\s|の)?画像/){|obj|tweet_pic(obj,obj.args[0])}
 
 command(/それは違うよ|もっと/) do |obj|
 	next if obj.in_reply_to_status_id === Twitter::NullObject

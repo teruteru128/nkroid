@@ -3,13 +3,15 @@
   ●update_name [Name]
   ●update_icon [Media]
   ●update_header [Media]
-  ●random 
+  ●random
+  ●status
 - |-
   Usage(2/3)
   ●image [SearchWord]
   ●copy_[name|icon|all] (@)[UserID]
   ●bbop
   ●calc [formula]
+  ●base64 [e|d] [str]
 - |-
   Usage(3/3)
   ●icon_by_search(alias:ibs) [SearchWord]

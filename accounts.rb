@@ -4,31 +4,24 @@ class AccountManager
 		@accounts = []
 		@limited = 0
 		@locked = false
-		Thread.new{loop{sleep 60*5;@limited = 0}}
-	end
+		Thread.new{loop{sleep 60*10;@limited=0}} end
 
 	def <<(account)
-		@accounts << account
-	end
+		@accounts << account end
 
 	def fallback
 		@limited += 1
-		@limited = 0 if @limited > @accounts.size
-	end
+		@limited = 0 if @limited > @accounts.size end
 
 	def cursor
-		@accounts[@limited]
-	end
+		@accounts[@limited] end
 
 	def [](i)
-		@accounts[i]
-	end
+		@accounts[i] end
 
 	def lock
-		@locked = true
-	end
+		@locked = true end
 
 	def unlock
-		@locked = false
-	end 
+		@locked = false end
 end
