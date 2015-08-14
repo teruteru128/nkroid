@@ -9,8 +9,8 @@ def copy(type,id,obj)
 		raise "User not found" if !$rest.user?(sn)
 		user = $rest.user(sn)
 		name,screen_name = user.name,user.screen_name
-		icon = user.profile_image_uri.to_s.gsub("_normal","")
-		banner = user.profile_banner_uri.to_s
+		icon = user.profile_image_uri(:original).to_s
+		banner = user.profile_banner_uri(:'1500x500').to_s
 		case type
 		when "name"
 			$rest.update_profile(:name => name)
