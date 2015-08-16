@@ -1,9 +1,9 @@
 /*.rb
 !accounts.rb
 !main.rb
-!system/intelligence.rb
-!system/yahoo_service.rb
 data/
+system/intelligence.rb
+system/yahoo_service.rb
 !data/help.yml
 !data/omikuji.yml
 plugins/image_recognition.rb
