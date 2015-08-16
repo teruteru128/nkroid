@@ -13,6 +13,10 @@ def command(cmd,opt={},&blk)
 	$cmd_list.push(/^(?!RT)@#{screen_name}\s+#{cmd}/)
 end
 
+def cmd?(text)
+	$cmd_list.any?{|cmd|cmd =~ text}
+end
+
 def callback(event,obj)
 	return if !$events[event]
 	$events[event].each do |c|
@@ -40,7 +44,7 @@ def extract(obj)
 	when Twitter::Streaming::Event
 		callback(:event, obj)
 	when Twitter::Streaming::FriendList
-		$connected = true
+		$following = obj
 	when Twitter::Streaming::DeletedTweet
 		callback(:delete, obj)
 	when Twitter::DirectMessage

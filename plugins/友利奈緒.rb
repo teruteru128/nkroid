@@ -1,14 +1,17 @@
 def 友利奈緒(obj)
+	twitter.fav obj
 	image = Dir.glob("./data/友利奈緒/*.png").sample
 	twitter.update_with_media(
-		"@#{obj.user.screen_name} 友利奈緒", open(image), in_reply_to_status_id: obj.id
+		"@#{obj.user.screen_name} 友利奈緒",
+		open(images),
+		in_reply_to_status_id: obj.id
 	)
 end
 
 on_event(:tweet) do |obj|
   text = obj.text
   next if text =~ /^RT/
-  next if text !~ /友利奈緒/
+  next if text.delete("\s") !~ /友利奈緒|ともりなお/
   Thread.new{友利奈緒(obj)}
 end
 

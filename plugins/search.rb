@@ -21,7 +21,7 @@ on_event(:tweet) do |obj|
 	case obj.text
 	when /(.+)\s+(?:検索|とは|#とは)/
 		google($1,obj)
-	when /(.+)\s*(?:is|って)何/
+	when /(.+)\s*(?:is|って)何$/
 		google($1,obj)
 	end
 end

@@ -2,11 +2,7 @@
 
 on_event(:tweet) do |obj|
 	#tweet
-	post(reply(obj.text)) if rand(299) == 0
-end
-
-def cmd?(text)
-	$cmd_list.any?{|cmd|cmd =~ text}
+	post(reply(obj.text)) if rand(399) == 0
 end
 
 on_event(:tweet) do |obj|

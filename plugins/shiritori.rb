@@ -70,7 +70,7 @@ on_event(:tweet) do |obj|
 	next if cmd? obj.text
 	next unless $shiritori[obj.user.id]
 	if obj.text =~ /^(?!RT)@#{screen_name}\s+(.+)/
-		word = $1
+		word = $1.gsub("@","@\u200b")
 		if $shiritori[obj.user.id].include?(word)
 			obj.reply "#{word}はすでに使用されています。\n#{Time.now}"
 			next

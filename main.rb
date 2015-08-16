@@ -9,6 +9,7 @@ require "pg"
 require "yaml"
 require "logger"
 require "timeout"
+require "redis"
 require "./accounts"
 $init_thread.kill;puts
 
@@ -24,7 +25,7 @@ $rest = Twitter::REST::Client.new($keys[0]);$accounts<<$rest #メインアカウ
 $keys[1..-2].each{|key|$accounts<<Twitter::REST::Client.new(key)} #規制用アカウント
 $stream = Twitter::Streaming::Client.new($keys[0])
 $db = PG::connect(YAML.load_file("./data/database.yml")["production"])
-$latestupdate = Time.now
+$redis = Redis.new
 
 cores = Dir.glob("./system/*.rb").sort
 cores.each do |core|
@@ -38,7 +39,7 @@ plugins.each do |plugin|
 	eval(File.read(plugin)) end
 
 def main
-	$stream.user(replies: "all") do |obj|
+	$stream.user(replies:"all") do |obj|
 		extract(obj)
 	end
 rescue

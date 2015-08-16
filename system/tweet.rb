@@ -17,10 +17,13 @@ class Twitter::Tweet
 			twitter.update(message,in_reply_to_status_id: self.id)
 		else
 			twitter.update("@#{self.user.screen_name} 文字数超過の為DMで結果を送信しました",in_reply_to_status_id: self.id)
-			$rest.dm(self.user.screen_name,text)
+			text.to_s.scan(/.{1,#{9900}}/).each do |mes|
+				$rest.dm(self.user.screen_name,mes)
+			end
 		end
-	rescue Twitter::Error::Forbidden
+	rescue Twitter::Error
 		$accounts.fallback
+		post $!.class
 		retry
 	rescue
 		$console.error $!
