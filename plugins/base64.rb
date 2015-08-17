@@ -1,6 +1,6 @@
 require "base64"
 
-command(/base64\s+(e|d)\s+(.+)/) do |obj|
+command("base64") do |obj|
 	type,str = *obj.args[0,2]
 	text = case type
 	when "e"

@@ -39,7 +39,7 @@ on_event(:tweet) do |obj|
 	end
 end
 
-command(/image\s(.+)/){|obj|tweet_pic(obj,obj.args[0])}
+command("image"){|obj|tweet_pic(obj,obj.args[0])}
 command(/(.+?)(?:\s|の)?画像/){|obj|tweet_pic(obj,obj.args[0])}
 
 command(/それは違うよ|もっと/) do |obj|

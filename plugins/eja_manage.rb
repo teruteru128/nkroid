@@ -1,6 +1,6 @@
 @ejacer = Hash.new
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	if obj.text =~ /(シコ|オナ)る/
 		next if obj.text =~ /rt/i
 		t = obj.created_at
@@ -9,7 +9,7 @@ on_event(:tweet) do |obj|
 	end
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	next if obj.text =~ /rt/i
 	if @ejacer.include?(obj.user.id)
 		hash = @ejacer[obj.user.id]
