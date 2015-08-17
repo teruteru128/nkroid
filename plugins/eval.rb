@@ -10,20 +10,20 @@ class Sandbox
 	end
 end
 
-command("eval") do |obj|
+command(/eval\s+(.+)/) do |obj|
 	statement = obj.args[0]
 	statement.gsub!(/\$|def|twitter|post/,"")
 	statement.gsub!("@","@\u200b")
 	obj.reply Sandbox.eval(statement)
 end
 
-command("calc") do |obj|
+command(/calc\s+(.+)/) do |obj|
 	formula = obj.args[0].gsub(/[^\d+\-^*]/,"")
 	formula.gsub!("^","**")
 	obj.reply Sandbox.eval(formula)
 end
 
-command("factor") do |obj|
+command(/factor\s+(.+)/) do |obj|
 	num = obj.args[0].to_i.abs
 	res = Sandbox.eval("`factor #{num}`",0).chomp
 	text = if res[-1] == ":"

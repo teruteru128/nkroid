@@ -26,4 +26,4 @@ on_event(:tweet) do |obj|
 	end
 end
 
-command("search"){|obj|google(obj.args[0],obj)}
+command(/search\s+(.+)/){|obj|google(obj.args[0],obj)}
