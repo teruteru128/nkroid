@@ -7,7 +7,7 @@ Thread.new do
 	end
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	case obj.text
 	when /(おなか|腹)(す|空|減)|空腹|はらへ/
 		next if obj.text =~ /rt/i

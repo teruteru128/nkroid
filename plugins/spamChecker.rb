@@ -1,6 +1,6 @@
 $spammer = Hash.new(0)
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	text = obj.text
 	next if text =~ /^RT/
 	next if text !~ /@null/

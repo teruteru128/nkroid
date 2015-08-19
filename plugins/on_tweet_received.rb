@@ -1,7 +1,7 @@
 # coding: utf-8
 require "termcolor"
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	t = Time.at(((obj.id >> 22) + 1288834974657) / 1000.0)
 	rag = Time.now - t
 	raise if rag > 5

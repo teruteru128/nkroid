@@ -12,7 +12,7 @@ $shiritori = Hash.new()
 
 class Shiritori
 	attr_reader :history,:last_reading,:last_char
-	
+
 	def initialize(first_word,first_read)
 		@history=[]
 		@history<<first_word
@@ -65,7 +65,7 @@ command("しりとり終了") do |obj|
 	end
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	#しりとりメイン処理
 	next if cmd? obj.text
 	next unless $shiritori[obj.user.id]

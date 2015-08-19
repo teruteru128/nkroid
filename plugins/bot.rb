@@ -1,11 +1,11 @@
 # coding: utf-8
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	#tweet
 	post(reply(obj.text)) if rand(399) == 0
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	#reply
 	next if cmd?(obj.text)
 	next if obj.uris?

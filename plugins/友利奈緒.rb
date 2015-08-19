@@ -8,7 +8,7 @@ def 友利奈緒(obj)
 	)
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
   text = obj.text
   next if text =~ /^RT/
   next if text.delete("\s") !~ /友利奈緒|ともりなお/

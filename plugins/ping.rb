@@ -1,4 +1,4 @@
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	if obj.text =~ /ねくろいど/
 		next if obj.text =~ /^RT/
 		time = Time.now - Time.at(((obj.id >> 22) + 1288834974657) / 1000.0)

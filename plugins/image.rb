@@ -30,7 +30,7 @@ rescue => e
 	$console.error e
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	case obj.text
 	when /^(?!RT)(.+?)(?:\s|\t)+画像/
 		word = $1.gsub(/(\s+|　+|\t+)$/,"").gsub(/(の|な)$/,"")

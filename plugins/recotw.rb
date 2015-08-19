@@ -35,7 +35,7 @@ rescue => e
 	obj.reply e.message+"\n#{Time.now}"
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	next if obj.text !~ /@#{screen_name}|recotw\s|\srecotw/
 	next unless obj.uris?
 	next if obj.text=~/rt/i

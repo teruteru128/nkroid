@@ -16,7 +16,7 @@ def google(word,obj)
 	obj.reply text
 end
 
-on_event(:tweet) do |obj|
+on(:tweet) do |obj|
 	next if obj.text =~ /rt|@/i
 	case obj.text
 	when /(.+)\s+(?:検索|とは|#とは)/
