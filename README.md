@@ -1,4 +1,5 @@
 # nkroid
-[@nkroid](http://twitter.com/nkroid)のソースコード  
-学習部はありません  
-プラグイン開発者募集してます
+
+[@nkroid](https://twitter.com/nkroid)のソース
+適当に変数いじればTwitterBotフレームワークとして使えるかもしれません
+が、そういったメンテナンス性は重視していないのでご了承ください
