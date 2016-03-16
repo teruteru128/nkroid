@@ -1,6 +1,5 @@
 .env
-config/
-db/
-!db/dic.sqlite
-test/
-Rakefile
+config/*
+!config/.keep
+db/*
+!db/.keep
