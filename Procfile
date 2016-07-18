@@ -1,1 +1,0 @@
-nkroid: ruby app.rb
