@@ -7,43 +7,40 @@ class Account
   end
 end
 
-class Plugin
+class PluginManager
   @@plugins = {}
   @@readed = []
 
-  attr_reader :proc
-  def initialize type, opts={}, &blk
-    @proc = blk
-    @opts = opts
-    @@plugins[type] ||= []
-    @@plugins[type] << self
-  end
-
   class << self
+    def add type, plugin
+      @@plugins[type] ||= []
+      @@plugins[type] << plugin
+    end
+
     def handle obj, account
       case obj
       when Twitter::Tweet
         return if @@readed.include?(obj.id)
         @@readed << obj.id
-        @@readed.delete_at(0) if @@readed.size > 100
+        @@readed.shift if @@readed.size > 100
 
-        return if @opts[:ignore_rt] && obj.retweet?
+        return if obj.retweet?
         callback :tweet, obj, account
-        @@plugins[:tweet].each do |plugin|
+        @@plugins[:command].to_a.each do |plugin|
           if obj.text =~ /^@(?:nkroid)\s+#{plugin.opts[:str]}/
             plugin.proc.call obj, account
           end
         end
       when Twitter::Streaming::FriendList
-        callback :friendlist, obj, account
-        @console.info "@#{account.screen_name} Stream connected."
+        callback :friend_list, obj, account
+        console.info "@#{account.screen_name} Stream connected."
       when Twitter::Streaming::Event
         callback :event, obj, account
       when Twitter::Streaming::DeletedTweet
         callback :deleted_tweet, obj, account
       end
     rescue
-      return
+      console.error $!
     end
 
     def callback type, obj, account
@@ -52,6 +49,51 @@ class Plugin
       end
     end
   end
+end
+
+class Plugin
+  @type = nil
+
+  attr_reader :proc, :opts
+  def initialize opts={}, &blk
+    @proc = blk
+    @opts = opts
+  end
+
+  class << self
+    def type type
+      @type = type
+    end
+
+    def hook opts={}, &blk
+      PluginManager.add @type, self.new(opts, &blk)
+    end
+  end
+end
+
+class Tweet < Plugin
+  type :tweet
+end
+
+class Command < Plugin
+  type :command
+
+  def self.register cmd, opts={}, &blk
+    opts = opts.merge({str: cmd})
+    PluginManager.add @type, self.new(opts, &blk)
+  end
+end
+
+class FriendList < Plugin
+  type :friend_list
+end
+
+class Event < Plugin
+  type :event
+end
+
+class DeletedTweet < Plugin
+  type :deleted_tweet
 end
 
 class Twitter::Tweet

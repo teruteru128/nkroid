@@ -5,7 +5,7 @@ require_relative "logger"
 require_relative "model"
 
 Dir.glob("plugin/**/*.rb").each do |plugin|
-  @console.debug "loaded #{plugin}"
+  console.debug "loaded #{plugin}"
   require_relative plugin
 end
 
@@ -24,10 +24,10 @@ threads = []
   threads << Thread.new do
     begin
       account.stream.user replies: 'all' do |obj|
-        Plugin.handle obj, account
+        PluginManager.handle obj, account
       end
     rescue
-      @console.error $!
+      console.error $!
       @accounts.first.rest.update("Error!\n#{$!.class} #{$!.message}") rescue exit
       retry
     end
