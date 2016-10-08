@@ -26,9 +26,9 @@ class PluginManager
 
         return if obj.retweet?
         callback :tweet, obj, account
-        @@plugins[:command].to_a.each do |plugin|
-          if obj.text =~ /^@(?:nkroid)\s+#{plugin.opts[:str]}/
-            plugin.proc.call obj, account
+        @@plugins[:command].to_a.each do |command|
+          if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
+            command.proc.call obj, account
           end
         end
       when Twitter::Streaming::FriendList
@@ -78,9 +78,15 @@ end
 class Command < Plugin
   type :command
 
+  attr_reader :arg
+  def initialize cmd, opts={}, &blk
+    @proc = blk
+    @opts = opts
+    @arg = cmd
+  end
+
   def self.register cmd, opts={}, &blk
-    opts = opts.merge({str: cmd})
-    PluginManager.add @type, self.new(opts, &blk)
+    PluginManager.add @type, self.new(cmd, opts, &blk)
   end
 end
 
