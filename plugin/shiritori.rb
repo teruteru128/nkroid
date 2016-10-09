@@ -77,7 +77,7 @@ Command.register "しりとり開始" do |tweet, account|
     shiritori = Shiritori.new
     user.locker = shiritori
     word = shiritori.last
-    tweet.reply "しりとり開始。最初は#{word.letter}の「#{word.furigana[-1]}」からです。", account.rest
+    tweet.reply "しりとり開始。最初は#{word.letter}(#{word.furigana[-1]})です。", account.rest
   end
 end
 
@@ -94,15 +94,15 @@ Command.register "しりとり終了" do |tweet, account|
 end
 
 Tweet.hook do |tweet, account|
-  next if tweet.text =~ /^@nkroid\s+([^\s]+)/
+  next if tweet.text !~ /^@nkroid\s+(.+)/
   next if Command.check(tweet)
   user = tweet.user
-  if user.locked? && user.locker.kind_of?(Shiritori)
+  if user.locker.kind_of?(Shiritori)
     shiritori = user.locker
-    next_word = Word.new($1, :player)
+    next_word = Shiritori::Word.new($1, :player)
     last_word = shiritori.last
     if next_word.furigana[0] != last_word.furigana[-1]
-      message = "しりとりが続いていません。次は#{last_word.letter}の「#{last_word.furigana}」】です。"
+      message = "しりとりが続いていません。次は#{last_word.letter}(#{last_word.furigana})です。"
     elsif next_word.furigana[-1] == "ん"
       message = "#{next_word.furigana[0..-2]}「ん」。あなたの負けです。しりとりを終了します。"
       user.unlock
