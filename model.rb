@@ -25,6 +25,7 @@ class PluginManager
         @@readed.shift if @@readed.size > 100
 
         return if obj.retweet?
+        return if obj.user.screen_name == "nkroid"
         callback :tweet, obj, account
         @@plugins[:command].to_a.each do |command|
           if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
@@ -77,16 +78,32 @@ end
 
 class Command < Plugin
   type :command
+  @@commands = []
 
   attr_reader :arg
   def initialize cmd, opts={}, &blk
     @proc = blk
     @opts = opts
     @arg = cmd
+    @@commands << cmd
   end
 
-  def self.register cmd, opts={}, &blk
-    PluginManager.add @type, self.new(cmd, opts, &blk)
+  class << self
+    def register cmd, opts={}, &blk
+      PluginManager.add @type, self.new(cmd, opts, &blk)
+    end
+
+    def commands
+      @@commands
+    end
+
+    def check tweet
+      @@commands.each do |cmd|
+        return true if tweet.text =~ /^@(?:nkroid)\s+#{cmd}/
+      end
+
+      return false
+    end
   end
 end
 
@@ -105,6 +122,26 @@ end
 class Twitter::Tweet
   def reply text, rest
     rest.update "@#{self.user.screen_name}\s"+text, in_reply_to_status: self
+  end
+end
+
+class Twitter::User
+  @@locker = {}
+
+  def locker
+    @@locker[self.id] ||= nil
+  end
+
+  def locker= locker
+    @@locker[self.id] = locker
+  end
+
+  def locked?
+    !!(@@locker[self.id] ||= nil)
+  end
+
+  def unlock
+    @@locker[self.id] = nil
   end
 end
 

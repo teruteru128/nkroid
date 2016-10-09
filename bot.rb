@@ -28,7 +28,7 @@ threads = []
       end
     rescue
       console.error $!
-      @accounts.first.rest.update("Error!\n#{$!.class} #{$!.message}") rescue exit
+      @accounts.first.rest.update("#{$!.class} #{$!.message}") rescue exit
       retry
     end
   end

@@ -3,7 +3,7 @@ Command.register /followback|フォロバ/ do |tweet|
 end
 
 Event.hook do |event|
-  if event.name == :follow && obj.target.screen_name == 'nkroid'
-    account('nkroid').rest.follow obj.source
+  if event.name == :follow && event.target.screen_name == 'nkroid'
+    account('nkroid').rest.follow event.source
   end
 end
