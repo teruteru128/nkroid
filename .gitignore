@@ -1,2 +1,3 @@
 config/accounts.yml
 data/nkroid.sqlite3
+plugin/conversation/*
