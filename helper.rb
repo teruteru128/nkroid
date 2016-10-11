@@ -9,3 +9,7 @@ end
 def sanitize_reply text
   text.gsub("@", "@\u200b")
 end
+
+def git_revision
+  `git rev-parse HEAD`[0, 8]
+end

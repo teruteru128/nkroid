@@ -20,6 +20,8 @@ def account name
   @accounts.find{|account|account.screen_name == name}
 end
 
+@accounts.first.rest.update("nkroid has started up(version: #{git_revision})")
+
 threads = []
 @accounts.each do |account|
   threads << Thread.new do

@@ -46,7 +46,7 @@ class PluginManager
       when Twitter::Streaming::DeletedTweet
         callback :deleted_tweet, obj, account
       end
-    rescue
+    rescue Exception
       console.error $!
     end
 
