@@ -26,6 +26,12 @@ class PluginManager
 
         return if obj.retweet?
         return if obj.user.screen_name == "nkroid"
+
+        obj.text =~ /^@.+?\s(.+)/
+        if $1
+          obj.args = $1.split
+        end
+
         callback :tweet, obj, account
         @@plugins[:command].to_a.each do |command|
           if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
@@ -120,6 +126,8 @@ class DeletedTweet < Plugin
 end
 
 class Twitter::Tweet
+  attr_accessor :args
+
   def reply text, rest
     rest.update "@#{self.user.screen_name}\s"+text, in_reply_to_status: self
   end
@@ -143,8 +151,4 @@ class Twitter::User
   def unlock
     @@locker[self.id] = nil
   end
-end
-
-def decodeSnowflake id
-  Time.at(((id >> 22) + 1288834974657) / 1000.0)
 end

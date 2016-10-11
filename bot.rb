@@ -3,6 +3,7 @@ Bundler.require
 
 require_relative "logger"
 require_relative "model"
+require_relative "helper"
 
 Dir.glob("plugin/**/*.rb").each do |plugin|
   console.debug "loaded #{plugin}"
