@@ -22,7 +22,7 @@ class Shiritori
   end
 
   def next_word
-    str = db.execute("select * from dic where reading like '#{self.last.furikana}%' order by random() limit 1")[0][0]
+    str = db.execute("select * from dic where reading like '#{self.last.furikana}%' and reading not like '%ン' order by random() limit 1")[0][0]
     Word.new(str, :cpu)
   rescue
     return nil
