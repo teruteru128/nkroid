@@ -124,6 +124,22 @@ class DeletedTweet < Plugin
   type :deleted_tweet
 end
 
+class Init
+  @@procs = []
+
+  class << self
+    def hook &blk
+      @@procs << blk
+    end
+
+    def call
+      @@procs.each do |blk|
+        blk.call
+      end
+    end
+  end
+end
+
 class Twitter::Tweet
   attr_accessor :args
 

@@ -20,6 +20,8 @@ def account name
   @accounts.find{|account|account.screen_name == name}
 end
 
+Init.call
+
 threads = []
 @accounts.each do |account|
   threads << Thread.new do
