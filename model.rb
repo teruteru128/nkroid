@@ -27,7 +27,7 @@ class PluginManager
         return if obj.retweet?
         return if obj.user.screen_name == "nkroid"
 
-        obj.text =~ /^@.+?\s(.+)/
+        obj.text =~ /^@\w+?\s+?(.+)/
         if $1
           obj.args = $1.split
         end
