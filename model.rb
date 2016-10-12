@@ -40,7 +40,6 @@ class PluginManager
         end
       when Twitter::Streaming::FriendList
         callback :friend_list, obj, account
-        console.info "@#{account.screen_name} Stream connected."
       when Twitter::Streaming::Event
         callback :event, obj, account
       when Twitter::Streaming::DeletedTweet
