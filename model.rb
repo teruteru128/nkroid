@@ -8,21 +8,21 @@ class Account
 end
 
 class PluginManager
-  @@plugins = {}
-  @@readed = []
+  @plugins = {}
+  @readed = []
 
   class << self
     def add type, plugin
-      @@plugins[type] ||= []
-      @@plugins[type] << plugin
+      @plugins[type] ||= []
+      @plugins[type] << plugin
     end
 
     def handle obj, account
       case obj
       when Twitter::Tweet
-        return if @@readed.include?(obj.id)
-        @@readed << obj.id
-        @@readed.shift if @@readed.size > 100
+        return if @readed.include?(obj.id)
+        @readed << obj.id
+        @readed.shift if @readed.size > 100
 
         return if obj.retweet?
         return if obj.user.screen_name == "nkroid"
@@ -33,7 +33,7 @@ class PluginManager
         end
 
         callback :tweet, obj, account
-        @@plugins[:command].to_a.each do |command|
+        @plugins[:command].to_a.each do |command|
           if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
             command.proc.call obj, account
           end
@@ -50,7 +50,7 @@ class PluginManager
     end
 
     def callback type, obj, account
-      @@plugins[type].to_a.each do |plugin|
+      @plugins[type].to_a.each do |plugin|
         plugin.proc.call obj, account
       end
     end
@@ -83,31 +83,29 @@ end
 
 class Command < Plugin
   type :command
-  @@commands = []
+  @commands = []
 
   attr_reader :arg
   def initialize cmd, opts={}, &blk
     @proc = blk
     @opts = opts
     @arg = cmd
-    @@commands << cmd
   end
 
   class << self
     def register cmd, opts={}, &blk
       PluginManager.add @type, self.new(cmd, opts, &blk)
+      @commands << cmd
     end
 
     def commands
-      @@commands
+      @commands
     end
 
     def check tweet
-      @@commands.each do |cmd|
-        return true if tweet.text =~ /^@(?:nkroid)\s+#{cmd}/
+      @commands.any? do |cmd|
+        tweet.text =~ /^@(?:nkroid)\s+#{cmd}/
       end
-
-      return false
     end
   end
 end
@@ -125,15 +123,15 @@ class DeletedTweet < Plugin
 end
 
 class Init
-  @@procs = []
+  @procs = []
 
   class << self
     def hook &blk
-      @@procs << blk
+      @procs << blk
     end
 
     def call
-      @@procs.each do |blk|
+      @procs.each do |blk|
         blk.call
       end
     end
