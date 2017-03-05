@@ -1,65 +1,75 @@
 class Account
   attr_reader :rest, :stream, :screen_name
+  attr_accessor :thread
+  @accounts = []
+
   def initialize(key)
-    @rest = Twitter::REST::Client.new key
-    @stream = Twitter::Streaming::Client.new key
+    @rest = Twitter::REST::Client.new(key)
+    @stream = Twitter::Streaming::Client.new(key)
     @screen_name = @rest.user.screen_name
   end
-end
 
-class PluginManager
-  @plugins = {}
-  @readed = []
+  def start_stream
+    self.stream.user replies: 'all' do |obj|
+      begin
+        case obj
+        when Twitter::Tweet
+          Tweet.callback obj, self
+
+          obj.text =~ /^@\w+?\s+?(.+)/
+          if $1
+            obj.args = $1.split
+          end
+          Command.all.each do |command|
+            if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
+              command.proc.call obj, self
+            end
+          end
+        when Twitter::Streaming::FriendList
+          FriendList.callback obj, self
+        when Twitter::Streaming::Event
+          Event.callback obj, self
+        when Twitter::Streaming::DeletedTweet
+          DeletedTweet.callback obj, self
+        end
+      rescue
+        console.error $!
+        next
+      end
+    end
+  rescue
+    console.error $!
+    retry
+  end
 
   class << self
-    def add type, plugin
-      @plugins[type] ||= []
-      @plugins[type] << plugin
+    attr_reader :accounts
+
+    def register *args
+      @accounts << self.new(*args)
     end
 
-    def handle obj, account
-      case obj
-      when Twitter::Tweet
-        return if @readed.include?(obj.id)
-        @readed << obj.id
-        @readed.shift if @readed.size > 100
-
-        return if obj.retweet?
-        return if obj.user.screen_name == "nkroid"
-
-        obj.text =~ /^@\w+?\s+?(.+)/
-        if $1
-          obj.args = $1.split
-        end
-
-        callback :tweet, obj, account
-        @plugins[:command].to_a.each do |command|
-          if obj.text =~ /^@(?:nkroid)\s+#{command.arg}/
-            command.proc.call obj, account
-          end
-        end
-      when Twitter::Streaming::FriendList
-        callback :friend_list, obj, account
-      when Twitter::Streaming::Event
-        callback :event, obj, account
-      when Twitter::Streaming::DeletedTweet
-        callback :deleted_tweet, obj, account
-      end
-    rescue Exception
-      console.error $!
+    def all
+      Array(@accounts)
     end
 
-    def callback type, obj, account
-      @plugins[type].to_a.each do |plugin|
-        plugin.proc.call obj, account
+    def find screen_name
+      @accounts.find{|a|a.screen_name == screen_name}
+    end
+
+    def threads
+      Account.all.map{|a|a.thread}
+    end
+
+    def load_yaml path
+      YAML.load_file(path).each do |k,v|
+        Account.register(v)
       end
     end
   end
 end
 
 class Plugin
-  @type = nil
-
   attr_reader :proc, :opts
   def initialize opts={}, &blk
     @proc = blk
@@ -67,24 +77,26 @@ class Plugin
   end
 
   class << self
-    def type type
-      @type = type
-    end
+    attr_reader :plugins
+    alias :all :plugins
 
     def hook opts={}, &blk
-      PluginManager.add @type, self.new(opts, &blk)
+      @plugins ||= []
+      @plugins << self.new(opts, &blk)
+    end
+
+    def callback *args
+      Array(@plugins).each do |plugin|
+        plugin.proc.call *args
+      end
     end
   end
 end
 
 class Tweet < Plugin
-  type :tweet
 end
 
 class Command < Plugin
-  type :command
-  @commands = []
-
   attr_reader :arg
   def initialize cmd, opts={}, &blk
     @proc = blk
@@ -94,48 +106,28 @@ class Command < Plugin
 
   class << self
     def register cmd, opts={}, &blk
-      PluginManager.add @type, self.new(cmd, opts, &blk)
-      @commands << cmd
+      @plugins ||= []
+      @plugins << self.new(cmd, opts, &blk)
     end
 
-    def commands
-      @commands
-    end
-
-    def check tweet
-      @commands.any? do |cmd|
-        tweet.text =~ /^@(?:nkroid)\s+#{cmd}/
+    def check text
+      @plugins.any? do |plugin|
+        text =~ /^@(?:nkroid)\s+#{plugin.arg}/
       end
     end
   end
 end
 
 class FriendList < Plugin
-  type :friend_list
 end
 
 class Event < Plugin
-  type :event
 end
 
 class DeletedTweet < Plugin
-  type :deleted_tweet
 end
 
-class Init
-  @procs = []
-
-  class << self
-    def hook &blk
-      @procs << blk
-    end
-
-    def call
-      @procs.each do |blk|
-        blk.call
-      end
-    end
-  end
+class Init < Plugin
 end
 
 class Twitter::Tweet
@@ -148,20 +140,12 @@ end
 
 class Twitter::User
   @@locker = {}
-
   def locker
-    @@locker[self.id] ||= nil
-  end
-
+    @@locker[self.id] ||= nil end
   def locker= locker
-    @@locker[self.id] = locker
-  end
-
+    @@locker[self.id] = locker end
   def locked?
-    !!(@@locker[self.id] ||= nil)
-  end
-
+    !!(@@locker[self.id] ||= nil) end
   def unlock
-    @@locker[self.id] = nil
-  end
+    @@locker[self.id] = nil end
 end

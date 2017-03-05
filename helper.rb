@@ -1,5 +1,9 @@
 require "time"
 
+def account screen_name
+  Account.find screen_name
+end
+
 def decodeSnowflake id
   Time.at(((id >> 22) + 1288834974657) / 1000.0)
 end
